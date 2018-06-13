@@ -2,6 +2,7 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup as bs
 import re
+import json
 
 def extractAndExport(html):
     #BeatifulSoup can parse the html using the tag 'html.parser'
@@ -10,16 +11,33 @@ def extractAndExport(html):
     #Now we use soup to scrape the data we want by using patterns in the html
     extracted_a = soup.find_all('a', attrs={'class': 'product-li'})
 
+    product_json = []
     for a in extracted_a:
         # Scraping product html by acessing its url
         req = requests.get(a.get('href'))
         product_html = bs(req.text, 'html.parser')
+        # Extracting category and subcategory
+        categories = [ctg.text for ctg in product_html.find_all('a', attrs={'class': 'breadcrumb__item'})]
+        
+        #technical_info = product_html.find_all('div')
+        # Only one div with class header-product per product page
         product_header = product_html.find_all('div', attrs={'class': 'header-product'})
-        for ph in product_header:
-            print(ph.get))
-        return
-        #for ph in product_header:
-        #    print(ph.get('data-product'))
+        if product_header:
+            data = json.loads(product_header[0].get('data-product'))
+            # Filtering seller only allowing magazineluiza
+            if data['seller'] == 'magazineluiza':
+                
+                product_json.append(product_header[0].get('data-product'))
+
+        # In the div there's only one data-product tag 
+        #product_json.append(json.loads(product_header.get('data-product')))
+        #product_json.append([ph.get('data-product') for ph in product_header])
+         
+
+    for _json in product_json:
+        print('BEGIN OF JSON')
+        print(_json)
+        print('END OF JSON')
     """   
     #Using pandas to create de tabular dataset and the export it to csv
     df = pd.DataFrame(frases, columns=['frase', 'gramatica'])
@@ -48,7 +66,7 @@ if __name__ == '__main__':
 
     while (n <= 1):
         #r is response object returned by the page resquest
-        r = requests.get('https://www.magazineluiza.com.br/lavadora-de-roupas-lava-e-seca/eletrodomesticos/s/ed/ela1/' + n.__str__() + '/')
+        r = requests.get('https://www.magazineluiza.com.br/geladeira-refrigerador/eletrodomesticos/s/ed/refr/' + n.__str__() + '/')
 
         #r.text has all the text from the html source
         html += r.text
