@@ -7,8 +7,11 @@ Pense numa aplicação onde esse script de crawler deve ser executado semanalmen
    Definiria uma arquitetura em camadas onde teria duas camadas a primeira sendo a camada responsável pela 
    extração dados, a segunda seria responsável pela base de dados sendo suas funções o processamento dos dados, 
    a inserção de novos produtos e atualizações nos produtos existentes a partir dos dados coletados pela primeira camada.
+   <img style="float: right;" src="https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png ">
+
+Continue markdown text...
    Inline-style: 
-                                            ![alt text](https://github.com/leoMurtha/birdie-internship/blob/master/data/arquitetura.png "Arquitetura Proposta")
+    ![alt text](https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png "Logo Title Text 1")
 
   
 ### O que deixaria automatizado/agendado?
