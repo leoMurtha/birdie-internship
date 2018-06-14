@@ -20,8 +20,6 @@ def extract(html, status=''):
     # Now we use soup to scrape the data we want by using patterns in the html
     extracted_a = soup.find_all('a', attrs={'class': 'product-li'})
 
-    # .csv column order
-    #cols = ['Titulo', 'Categoria', 'Preco', 'SKU', 'Marca', 'Modelo']
     # list containing products attributes in JSON(dictionary) format
     product_json = []
     product_htmls = []
@@ -33,10 +31,11 @@ def extract(html, status=''):
             product_htmls.append(req.text)
         except requests.exceptions.ConnectionError:
             print("Connection refused by the server..")
+            # Sleeping so that the server don't refuse the request again
             sleep(3)
             continue
 
-    print('Acessou todos links')
+    print('Acessed every product link')
 
     # After extracting all available products pages html
     # Extract requested informations per product
