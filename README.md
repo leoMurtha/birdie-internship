@@ -7,7 +7,7 @@ Pense numa aplicação onde esse script de crawler deve ser executado semanalmen
    Definiria uma arquitetura em camadas onde teria duas camadas a primeira sendo a camada responsável pela 
    extração dados, a segunda seria responsável pela base de dados sendo suas funções o processamento dos dados, 
    a inserção de novos produtos e atualizações nos produtos existentes a partir dos dados coletados pela primeira camada.
-      <img style="width: 80px;" src="https://github.com/leoMurtha/birdie-internship/blob/master/data/arquitetura.png ">
+      <img style="width: 80px; margin-left: 4px" src="https://github.com/leoMurtha/birdie-internship/blob/master/data/arquitetura.png ">
    
 
   
