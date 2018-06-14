@@ -1,21 +1,23 @@
 from nltk import tokenize
 from nltk.stem.rslp import RSLPStemmer
+import tflearn
+import tensorflow as tf
+import numpy as np
 import os
 import json
 import pandas as pd
-import datetime
-import numpy as np
-stemmer = RSLPStemmer()
+import random
 
-#https://machinelearnings.co/text-classification-using-neural-networks-f5cd7b8765c6
+# stemmer for portugues language
+stemmer = RSLPStemmer()
 
 def bag_of_words(docs, words, classes):
     # Creating our data
     data = []
-    output = []
-    # Empty array for the output
-    output_empty = np.zeros((1, len(classes)))
-    
+    target = []
+    # Empty array for the target
+    target_empty = [0] * len(classes)
+
     for doc in docs:
         # Create a bow for each document
         bow = []
@@ -24,9 +26,18 @@ def bag_of_words(docs, words, classes):
         # stemming words
         tokens = [stemmer.stem(word.lower()) for word in tokens]
         # Creating the bag of words
-        bow = [bow.append(1) if word in tokens else bow.append(0) for word in words]
-        output_row = list(output_empty)
-        output_row[categories.index(doc[1])]
+        for word in words:
+            bow.append(1) if word in tokens else bow.append(0)
+        data.append(bow)
+
+        # Target is a 0 for each class and 1 for the current class
+        target_row = list(target_empty)
+        target_row[classes.index(doc[1])] = 1
+        target.append(target_row)
+
+    return data, target
+
+
 def preprocessing(dataset):
     """
         Organize the dataset into classes, documents and words.
@@ -38,8 +49,8 @@ def preprocessing(dataset):
     # Creating the lists
     classes = []
     docs = []
-    words = [] 
-    
+    words = []
+
     # Going through the dataset
     for data in dataset:
         # Tokenization of the title in data
@@ -49,7 +60,8 @@ def preprocessing(dataset):
         # For these tokens associate them to the class = document
         docs.append((tokens, data['categoria']))
         # Add the unique classes to our classes list
-        if data['categoria'] not in classes: classes.append(data['categoria'])
+        if data['categoria'] not in classes:
+            classes.append(data['categoria'])
 
     # Stemming = process of find the root of the word
     # Stem and lower each word also remove duplicates
@@ -60,6 +72,7 @@ def preprocessing(dataset):
 
     return docs, words, classes
 
+
 def main():
     # Preprocessing
     # Reading the crawled data
@@ -68,10 +81,45 @@ def main():
     # Creating the dataset
     dataset = []
     for category, title in zip(df['category'], df['Titulo']):
-        dataset.append({'categoria': category, 'titulo': title})
+        # classes only geladeira/refrigerador and lavadora
+        # replace frigobar with geladeira/refrigerador
+        category = category.replace('/ ', '/').split(' ')[0].lower()
+        if(category not in ('acessórios')):
+            if(category in ('frigobar')): category = 'geladeira/refrigerador'
+            dataset.append({'categoria': category, 'titulo': title})
 
     docs, words, classes = preprocessing(dataset)
     X, y = bag_of_words(docs, words, classes)
+
+    # Shuffling the data so that the model doesn't overfit
+    random.seed(a=12)
+    random.shuffle(X)
+    random.shuffle(y)
+    X = np.array(X)
+    y = np.array(y)
+
+    # TensorFlow for building and training the classifier
+    # Building the NN
+    nn = tflearn.input_data(shape=[None, len(X[0])])
+    nn = tflearn.fully_connected(nn, 10, activation='sigmoid')
+    # Dropout so that the neural network don't memorize the data
+    nn = tflearn.dropout(nn, 0.3)
+    nn = tflearn.fully_connected(nn, 10, activation='sigmoid')
+    nn = tflearn.fully_connected(nn, 10, activation='relu')    
+    # Dropout so that the neural network don't memorize the data
+    
+    # Output layer, softmax as activation function (best for classification)
+    nn = tflearn.fully_connected(nn, len(y[0]), activation='softmax')
+    # Applys linear or logistic regression to the input
+    nn = tflearn.regression(nn, optimizer='adam', loss='categorical_crossentropy')
+
+    # Defining the deep neural network model and setting up the tensorboard
+    model = tflearn.DNN(nn, tensorboard_dir='tflearn_logs')
+    # Training using adam as optmizer and crossentropy loss function
+    # Using 70% for training and 30% for validation(testing)
+    model.fit(X, y, validation_set=0.3, batch_size=8, n_epoch=1000, show_metric=True)
+    # Saving the trained model that ill be used for testing later
+    model.save('model.tflearn')
 
 if __name__ == '__main__':
     main()
