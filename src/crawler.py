@@ -33,10 +33,7 @@ def extract(html, status=''):
             product_htmls.append(req.text)
         except requests.exceptions.ConnectionError:
             print("Connection refused by the server..")
-            print("Let me sleep for 5 seconds")
-            print("ZZzzzz...")
-            sleep(5)
-            print("Was a nice sleep, now let me continue...")
+            sleep(3)
             continue
 
     print('Acessou todos links')
@@ -45,25 +42,30 @@ def extract(html, status=''):
     # Extract requested informations per product
     for product_html in product_htmls:
         product_html = bs(product_html, 'html.parser')
-        # Only available products
-        # <p class="unavailable__product-title">Não disponível</p>
-        if product_html.find('p', attrs={'class': 'unavailable__product-title'}):
-            print('Produto não disponivel')
-            continue
         # Only one div with class header-product per product page
-        product_header = product_html.find_all(
-            'div', attrs={'class': 'header-product'})
+        product_header = product_html.find_all('div', attrs={'class': 'header-product'+status})
         product_data = {}
+        # If there is a product header so the extraction is valid otherwise continue
         if product_header:
             # In the div there's only one data-product tag
             data = json.loads(product_header[0].get('data-product'))
             # Filtering seller only allowing magazineluiza
-            if data['seller'].upper() != 'MAGAZINELUIZA':
+            # Inspecting the site's HTML the default seller is magazineluiza
+            # so when the key seller isn't in the JSON we still extract info from the product
+            if 'seller' in data and data['seller'].upper() != 'MAGAZINELUIZA': 
                 continue  # Go to the next product
-            # New dictionary with product sku, fullTitle and the listPrice
+            # New dictionary with product sku and the listPrice
             product_data = {k: data[k] for k in (
-                'sku', 'fullTitle', 'listPrice') if k in data.keys()}
+                'sku', 'listPrice') if k in data.keys()}
+        else: continue
 
+        # Extracting the title for available or unavailable products
+        title = {'Titulo' : ''}
+        title_html = product_html.find(
+            'h1', attrs={'class': 'header-product__title'+status})
+        title_text = title_html.text.strip().replace('"', '')
+        title['Titulo'] = title_text
+        
         # Extracting category from the breadcrumb element
         breadcrumb_itens = product_html.find_all(
             'a', attrs={'class': 'breadcrumb__item'})
@@ -92,35 +94,35 @@ def extract(html, status=''):
                 if (type.upper() == 'MARCA') or (type.upper() == 'MODELO'):
                     technical_info[type] = value
 
-        # Updating the product json adding category and technical information dictionary
-        product_data.update(technical_info)
+        # Updating the product json adding title, category and technical information dictionary
+        product_data.update(title)
         product_data.update(category)
+        product_data.update(technical_info)
         # Sorting the dictionary to mantain consistency on the order of the keys
         product_data = {k: product_data[k] for k in sorted(product_data)}
         # Inserting new product data to the product json
         product_json.append(product_data)
-
+        
     return product_json
 
 
-def export(data):
+def export(data, filename='file'):
     # Using pandas to create de tabular dataset and the export it to csv
     df = pd.DataFrame.from_dict(data)
 
     # if the file does'nt exist create and write
-    if not os.path.isfile('magazine_products.csv'):
+    if not os.path.isfile(filename + '.csv'):
         # Exporting it to csv, index false indicates not to put the index in the csv
-        df.to_csv('magazine_products.csv', index=False, encoding='utf-8')
+        df.to_csv(filename + '.csv', index=False, encoding='utf-8')
     else:
         # Appending it to csv, index false indicates not to put the index in the csv
-        df.to_csv('magazine_products.csv', mode='a',
+        df.to_csv(filename + '.csv', mode='a',
                   index=False, encoding='utf-8', header=False)
 
     # To read the exported csv use the function below
     # df = pd.read_csv('frases.csv', encoding='utf-8')
 
-
-if __name__ == '__main__':
+def main():
     n = 1
     html = ''
 
@@ -132,7 +134,7 @@ if __name__ == '__main__':
         # r.text has all the text from the html source
         html += r.text
         n += 1
-
+    
     n = 1
     url = 'https://www.magazineluiza.com.br/geladeira-refrigerador/eletrodomesticos/s/ed/refr/'
     while (n <= 6):
@@ -142,9 +144,16 @@ if __name__ == '__main__':
         # r.text has all the text from the html source
         html += r.text
         n += 1
+    
 
     # Deleting all the html comments to facilitate the search
     html = re.sub(re.compile("<!--.*?-->", re.DOTALL), "", html)
 
-    product_data = extract(html, 'unavalaible')
-    export(product_data, 'magazine_unavailable_products.csv')
+    product_data = extract(html, '--unavailable')
+    product_data.extend(extract(html))
+
+    export(product_data, 'magazine_products')
+
+
+if __name__ == '__main__':
+    main()
