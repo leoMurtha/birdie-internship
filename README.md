@@ -2,6 +2,7 @@
 
 ## Uso
   Para rodar o crawler é so dar python3 crawler.py.
+  
   Para rodar o modelo é so dar python3 model.py.
 
 ## Coleta e Pré-processamento
