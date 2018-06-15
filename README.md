@@ -62,7 +62,7 @@ Pense numa aplicação onde esse script de crawler deve ser executado semanalmen
    Definiria uma arquitetura em camadas onde teria duas camadas a primeira sendo a camada responsável pela 
    extração dados, a segunda seria responsável pela base de dados sendo suas funções o processamento dos dados, 
    a inserção de novos produtos e atualizações nos produtos existentes a partir dos dados coletados pela primeira camada.
-  <img style="margin: 4em;" src="https://github.com/leoMurtha/birdie-internship/blob/master/data/arquitetura.png ">
+  $$<img style="margin: 4em;" src="https://github.com/leoMurtha/birdie-internship/blob/master/data/arquitetura.png ">$$
    
 ### O que deixaria automatizado/agendado?
    O crawler teria um processo rodando que monitora se páginas ou produtos foram adicionados e por exemplo todo
