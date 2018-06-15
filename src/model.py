@@ -35,11 +35,11 @@ def main():
     tf.reset_default_graph()
     # Building the NN
     nn = tflearn.input_data(shape=[None, len(X[0])])
-    nn = tflearn.fully_connected(nn, 10, activation='relu')
+    nn = tflearn.fully_connected(nn, 10, activation='relu') 
+    nn = tflearn.dropout(nn, 0.2)
     nn = tflearn.fully_connected(nn, 10, activation='sigmoid')
-    nn = tflearn.fully_connected(nn, 8, activation='relu')
-    # Dropout so that the neural network don't memorize the data
-    nn = tflearn.dropout(nn, 0.3)
+    # Dropout so that the neural network don't memorize the data and prevent overfitting
+    nn = tflearn.fully_connected(nn, 10, activation='relu')
     # Output layer, softmax as activation function (best for classification)
     nn = tflearn.fully_connected(nn, len(y[0]), activation='softmax')
     # Applys linear or logistic regression to the input
@@ -49,7 +49,7 @@ def main():
     model = tflearn.DNN(nn, tensorboard_dir='data/tflearn_logs')
     # Training using adam as optmizer and crossentropy loss function
     # Using 70% for training and 30% for validation(testing)
-    model.fit(X, y, validation_set=0.3, batch_size=16, n_epoch=1000, show_metric=True)
+    model.fit(X, y, validation_set=0.3, batch_size=12, n_epoch=500, show_metric=True)
     # Saving the trained model that ill be used for testing later
     model.save('model/model.tflearn')
 
