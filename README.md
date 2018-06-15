@@ -1,5 +1,9 @@
 # birdie-internship
 
+## Uso
+  Para rodar o crawler é so dar python3 crawler.py.
+  Para rodar o modelo é so dar python3 model.py.
+
 ## Coleta e Pré-processamento
   
 Usando as técnicas que lhe forem mais familiares e amigáveis (linguagem, frameworks, arquitetura), faça um crawler para capturar os dados das categorias [Geladeira-Refrigeradores](https://www.magazineluiza.com.br/geladeira-refrigerador/eletrodomesticos/s/ed/refr/) e [Lavadora-Lava e Seca](https://www.magazineluiza.com.br/lavadora-de-roupas-lava-e-seca/eletrodomesticos/s/ed/ela1/) do site MagazineLuiza .

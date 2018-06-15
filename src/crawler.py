@@ -1,4 +1,5 @@
 import pandas as pd
+import math
 import requests
 from bs4 import BeautifulSoup as bs
 import re
@@ -106,6 +107,9 @@ def extract(html, status=''):
 
 
 def export(data, filename='file'):
+    """
+        Exports the data to file in csv format with the name filename.csv
+    """    
     # Using pandas to create de tabular dataset and the export it to csv
     df = pd.DataFrame.from_dict(data)
 
@@ -124,9 +128,15 @@ def export(data, filename='file'):
 def main():
     n = 1
     html = ''
-
+    
     url = 'https://www.magazineluiza.com.br/lavadora-de-roupas-lava-e-seca/eletrodomesticos/s/ed/ela1/'
-    while (n <= 5):
+    r = requests.get(url)
+    
+    # Getting number of pages by doing total product/product per page
+    total = int(bs(r.text, 'html.parser').find('div', attrs={'class': 'product-showcase-bottom'}).find_all('span', attrs={})[1].text.split(' ')[-2])
+    nEla = math.ceil(total/60.0)
+    
+    while (n <= nEla):
         # r is response object returned by the page resquest
         r = requests.get(url + n.__str__() + '/')
         print(url + n.__str__() + '/', r)
@@ -135,8 +145,15 @@ def main():
         n += 1
     
     n = 1
+    
     url = 'https://www.magazineluiza.com.br/geladeira-refrigerador/eletrodomesticos/s/ed/refr/'
-    while (n <= 6):
+    r = requests.get(url)
+    
+    # Getting number of pages by doing total product/product per page
+    total = int(bs(r.text, 'html.parser').find('div', attrs={'class': 'product-showcase-bottom'}).find_all('span', attrs={})[1].text.split(' ')[-2])
+    nRefr = math.ceil(total/60.0)
+    
+    while (n <= nRefr):
         # r is response object returned by the page resquest
         r = requests.get(url + n.__str__() + '/')
         print(url + n.__str__() + '/', r)
@@ -148,9 +165,11 @@ def main():
     # Deleting all the html comments to facilitate the search
     html = re.sub(re.compile("<!--.*?-->", re.DOTALL), "", html)
 
+    # Extracts both available and unavailable products
     product_data = extract(html, '--unavailable')
     product_data.extend(extract(html))
 
+    # Saving the data to csv using pandas
     export(product_data, 'magazine_products')
 
 
