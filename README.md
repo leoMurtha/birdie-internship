@@ -9,12 +9,15 @@ Pense numa aplicação onde esse script de crawler deve ser executado semanalmen
    a inserção de novos produtos e atualizações nos produtos existentes a partir dos dados coletados pela primeira camada.
       <img style="width: 50px;" src="https://github.com/leoMurtha/birdie-internship/blob/master/data/arquitetura.png ">
    
-
-  
 ### O que deixaria automatizado/agendado?
+   O crawler teria um processo rodando contando e monitorando se páginas ou produtos foram adicionados e por exemplo todo
+   domingo às 00h ele rodaria a aplicação novamente.
   
-### O que monitorar pra acompanhar a saúde/qualidade da aplicação?
+### O que monitorar para acompanhar a saúde/qualidade da aplicação?
+   Se os dados estão consistentes e não redundantes assim como também se o crawler está conseguindo acessar corretamente os
+   links.
   
 ### Na sua opinião, quais são os principais riscos que podem causar erros na execução desse script?
-  
-
+   Como se trata de um crawler o risco mais preocupante é se o site da onde se está extraindo informações tomar um update que
+   mude seu layout e seus HTML comprometendo o parsing e o regex feitos pelo crawler para extrair somente as informações
+   requisitadas.
