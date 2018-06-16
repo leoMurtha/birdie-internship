@@ -38,7 +38,7 @@ A partir dos dados coletados, crie um modelo de classificação para predizer a 
 
 Para se treinar o modelo foi feito um pré-processamento antes, nota-se que nos dados há 6 categorias 
 (Geladeira/Refrigerador (Frost Free, Inox, Duplex, Acessórios), Lavadora de Roupas Lava e Seca, Frigobar)
-Eu considerei que todos tipos de geladeira e refrigerador assim como também frigobar se encaixam na categoria de geladeira/refrigerador,
+Eu considerei que todos tipos de geladeiras e refrigeradores assim como também frigobar se encaixavam na categoria de geladeira/refrigerador,
 acessórios foram desconsiderados e as classes resultantes são [geladeira/refrigerador, lavadora]
 
 A Arquitetura utilizada é composta(em ordem) de:
