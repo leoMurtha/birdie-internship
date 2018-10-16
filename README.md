@@ -32,7 +32,7 @@ A partir dos dados coletados, crie um modelo de classificação para predizer a 
 **Bibliotecas Utilizadas**
 - Linguagens
   - [Python](https://www.python.org/)
-- Bibliotecas para crawler
+- Bibliotecas para ML
   - [TensorFlow](https://www.tensorflow.org/)
   - [NLTK](https://www.nltk.org/)
 
